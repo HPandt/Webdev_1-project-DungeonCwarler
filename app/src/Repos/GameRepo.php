@@ -218,9 +218,9 @@ class GameRepo extends Repository implements IGameRepo{
         // Implementation here
         $sql = "SELECT r.*, rt.type, rt.name, rt.description 
         FROM Dungeon d 
-        JOIN Rooms r ON d.current_room_id = r.id
+        JOIN Rooms r ON r.id =  d.current_room_id
         JOIN RoomTemplate rt ON r.room_temp_id = rt.id 
-        ON r.id = d.current_room_id WHERE d.id = :dungeonId";
+        WHERE d.id = :dungeonId";
         $getRoom = $this->getConnection()->prepare($sql);
         $getRoom->execute(['dungeonId' => $dungeonId]);
         return $getRoom->fetch(\PDO::FETCH_ASSOC);

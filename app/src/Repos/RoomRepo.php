@@ -7,7 +7,8 @@ use App\Core\Repository;
 class RoomRepo extends Repository implements IRoomRepo{
 
     public function getRoomById(int $roomId) {
-        $sql = "SELECT r.*, rt.name, rt.description, rt.type FROM Rooms r 
+        $sql = "SELECT r.*, rt.name, rt.description, rt.type 
+        FROM Rooms r 
         JOIN RoomTemplate rt ON r.room_temp_id = rt.id 
         WHERE r.id = :roomId";
         $getRoom = $this->getConnection()->prepare($sql);

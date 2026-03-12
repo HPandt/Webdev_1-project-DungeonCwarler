@@ -101,15 +101,14 @@ class GameController {
         $direction = $data['direction'] ?? null;
 
         if(!$dungeonId || !$direction){
-            header('Location: /game/dungeon');
-            exit;
+            echo json_encode(['error' => 'Invalid move']);
+            return;
         }
 
         $room = $this->gameService->chooseDirection($dungeonId, $direction);
-        $response = $this->gameService->buildRoomLogResponse($room->id);
+        $response = $this->gameService->buildRoomLogResponse($room['id']);
         header('Content-Type: application/json');
         echo json_encode($response);
-        exit;
     }
 
     public function attack() {

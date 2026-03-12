@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         appendToLog({
             type: "info",
-            text: `You woke up in ${data.roomName}`
+            text: `You woke up in the Dungeon ${data.roomName}`
         });
         appendToLog({
             type: "info",

@@ -93,7 +93,7 @@ class GameService implements IGameService {
         $room = $this->roomRepository->getRoomById($roomId);
         $data = [
             'roomName' => $room['name'],
-            'roomDescription' => $room['description'],
+            'description' => $room['description'],
             'type' => $room['type']
         ];
 
