@@ -1,0 +1,32 @@
+.log-entry {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.3s ease forwards;
+    transition: all .25s ease;
+    margin-bottom: 4px;
+    font-family: monospace;
+}
+
+.log-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.log-attack { color: #ffffff; }
+.log-system{
+    color: #8888;
+    font-style: italic;
+}
+.log-info { color: #4caf50; font-weight: bold; }
+.log-miss { color: #f44336; }
+.log-danger { color: #f44336; }
+.log-hit { color: #ff9800; }
+.log-xp { color: #9c27b0; }
+.log-death { color: #e91e63; font-weight: bold; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
