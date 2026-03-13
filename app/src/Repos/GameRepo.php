@@ -129,7 +129,7 @@ class GameRepo extends Repository implements IGameRepo{
 
     public function chooseDirection(int $dungeonId, string $direction) {
         // Implementation here
-        $sql = "SELECT r.* FROM Dungeon d JOIN rooms r ON r.id = d.current_room_id WHERE d.id = ?";
+        $sql = "SELECT r.* FROM Dungeon d JOIN Rooms r ON r.id = d.current_room_id WHERE d.id = ?";
         $getRooms = $this->getConnection()->prepare($sql);
         $getRooms->execute([$dungeonId]);
         $currentRoom = $getRooms->fetchAll(\PDO::FETCH_ASSOC);

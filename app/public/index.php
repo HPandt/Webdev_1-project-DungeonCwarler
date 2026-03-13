@@ -36,7 +36,7 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     //Api routes
     $r->addRoute('GET', '/api/game/start', ['App\Controllers\GameController', 'startDungeon']);
     //$r->addRoute('GET', '/api/game/choose-direction', ['App\Controllers\GameController', 'chooseDirection']);
-    $r->addRoute('POST', '/api/game/choose-direction', ['App\Controllers\GameController', 'chooseDirection']);
+    $r->addRoute(['POST', 'GET'], '/api/game/choose-direction', ['App\Controllers\GameController', 'chooseDirection']);
     $r->addRoute('GET', '/api/game/attack', ['App\Controllers\GameController', 'attack']);
     
 });

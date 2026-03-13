@@ -60,7 +60,7 @@ class GameService implements IGameService {
         }
 
         $currentRoom = $this->gameRepository->getCurrentRoom($dungeonId);
-
+ 
         if (!$currentRoom){
             return [
                 'success' => false,
@@ -87,7 +87,10 @@ class GameService implements IGameService {
         $this->gameRepository->updateCurrentRoom($dungeonId, $nextRoomId);
         $this->roomRepository->markDiscovered($nextRoomId);
 
-        return $this->gameRepository->chooseDirection($dungeonId, $direction);
+        return [
+            'success' => true,
+            'roomId' => $nextRoomId
+        ];
     }
     public function buildRoomLogResponse(int $roomId) {
         $room = $this->roomRepository->getRoomById($roomId);

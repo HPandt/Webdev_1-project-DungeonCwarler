@@ -97,8 +97,9 @@ class GameController {
 
     public function chooseDirection() {
         $dungeonId = $_SESSION['dungeon_id'] ?? null;
-        $data = json_decode(file_get_contents("php://input"), true);
-        $direction = $data['direction'] ?? null;
+        //$data = json_decode(file_get_contents("php://input"), true);
+        //$direction = $data['direction'] ?? null;
+        $direction = $_POST['direction'] ?? null;
 
         if(!$dungeonId || !$direction){
             echo json_encode(['error' => 'Invalid move']);
@@ -106,7 +107,12 @@ class GameController {
         }
 
         $room = $this->gameService->chooseDirection($dungeonId, $direction);
-        $response = $this->gameService->buildRoomLogResponse($room['id']);
+        if (!$room['success']) {
+            echo json_encode(['error' => $room['message']]);
+            return;
+        }   
+
+        $response = $this->gameService->buildRoomLogResponse($room['roomId']);
         header('Content-Type: application/json');
         echo json_encode($response);
     }
