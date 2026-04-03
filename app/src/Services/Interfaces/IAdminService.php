@@ -3,7 +3,8 @@
 namespace App\Services\Interfaces;
 use App\Models\Templates\CharacterTemplate;
 use App\Models\Templates\MonsterTemplate;
-use App\Models\Templates\RoomsTemplate;
+use App\Models\Templates\RoomTemplate;
+use App\Models\UserModel;
 
 interface IAdminService {
 
@@ -23,14 +24,15 @@ interface IAdminService {
     public function getMonsterTemplateById(int $monsterId);
 
     // Room management
-    public function createRoom( RoomsTemplate $roomTemplate);
-    public function updateRoom( RoomsTemplate $roomTemplate);
-    public function deleteRoom(int $roomId);
-    public function getAllRooms();
-    public function getRoomById(int $roomId);
+        public function createRoomTemplate(RoomTemplate $roomTemplate);
+    public function updateRoomTemplate(RoomTemplate $roomTemplate);
+    public function deleteRoomTemplate(int $roomId);
+    public function getAllRoomTemplates();
+    public function getRoomTemplateById(int $roomId);
 
     // User management
     public function getAllUsers();
     public function getUserById(int $userId);
+    public function updateUser(UserModel $user): bool;
     public function deleteUser(int $userId);
 }

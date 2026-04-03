@@ -13,7 +13,15 @@ use App\Models\Enums\CharacterClass;
 
 
 class GameRepo extends Repository implements IGameRepo{
-    public function generateDungeon($characterId, $startingRoomId) {
+
+private RoomRepo $roomRepository;
+
+public function __construct()
+{
+    $this->roomRepository = new RoomRepo();
+}
+
+public function generateDungeon($characterId, $startingRoomId) {
         // Creates a new dungeon for selected character and starts at first room ID -30
         $sql = "INSERT INTO Dungeon (character_id, current_room_id) VALUES (?, ?)";
         $createDungeon = $this->getConnection()->prepare($sql);
@@ -86,10 +94,12 @@ class GameRepo extends Repository implements IGameRepo{
     {
         //Get monster info from template into room and make instance and if monster hp is zero dont get it
         $sql = "SELECT m.id AS monster_template_id,
-        m.name, m.img, r.monster_current_hp, m.hp, m.strength, m.dex, m.xp_reward 
-        FROM Rooms r JOIN MonsterTemplate m ON m.id = r.monster_template_id 
+        m.name, m.img, r.monster_current_hp, m.base_hp, m.base_strength, m.base_dex, m.xp_reward 
+        FROM Rooms r
+        JOIN MonsterTemplate m ON m.id = r.monster_temp_id 
         WHERE r.id = :roomId
-        AND r.monster_template_id IS NOT NULL AND r.monster_current_hp > 0
+        AND r.monster_temp_id IS NOT NULL 
+        AND r.monster_current_hp > 0
         LIMIT 1";
         $getMonster = $this->getConnection()->prepare($sql);
         $getMonster->execute(['roomId' => $roomId]);
@@ -104,9 +114,9 @@ class GameRepo extends Repository implements IGameRepo{
             (int)$row['monster_template_id'],
             $row['name'],
             $row['img'],
-            (int)$row['hp'],
+            (int)$row['base_hp'],
             (int)$row['monster_current_hp'],
-            (int)$row['strength'],
+            (int)$row['base_strength'],
             (int)$row['base_dex'],
             (int)$row['xp_reward']
 
@@ -134,22 +144,42 @@ class GameRepo extends Repository implements IGameRepo{
         $getRooms->execute([$dungeonId]);
         $currentRoom = $getRooms->fetchAll(\PDO::FETCH_ASSOC);
 
+
         if (!$currentRoom) {
             return [
                 'success' => false,
                 'message' => 'Current room not found.'
             ];
         }
-
+        $currentRoom = $currentRoom[0]; // Get the first (and should be only) room
+        
         //Direction logic 
         $dir = $direction . "_room_id";
-        if(empty($currentRoom[$dir])){
-        return ['success' => false, 'reason'=> 'wall'];
+        if(!empty($currentRoom[$dir])){
+        return ['success' => true, 'next_room_id'=> $currentRoom[$dir]]; // Return null if no room in that direction
         }
 
+        //randomize room from count in template table
+        $countSql = "SELECT COUNT(*) as total FROM RoomTemplate";
+        $countStmt = $this->getConnection()->prepare($countSql);
+        $countStmt->execute();
+        $totalRooms = (int)$countStmt->fetchColumn();
+        $randomTemplateId = rand(5, $totalRooms);
+        $newRoom = $this->roomRepository->createRoomFromTemplate($dungeonId, $randomTemplateId);
+
+        if (!$newRoom) {
+            return [
+                'success' => false,
+                'message' => 'Failed to create new room.'
+            ];
+        }
+        $newRoomId = $newRoom['id'];
+        $this->roomRepository->updateRoomDirection($currentRoom['id'], $direction, $newRoomId);
+
+        $this->updateCurrentRoom($dungeonId, $newRoomId);
         return [
             'success' => true,
-            'next_room_id' => $currentRoom[$dir]
+            'next_room_id' => $newRoomId
         ];
     }
 

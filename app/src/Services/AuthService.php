@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Repos\AuthRepo;
 use App\Services\Interfaces\IAuthService;
 use App\Repos\Interfaces\IAuthRepo;
 use App\Models\UserModel;
@@ -9,8 +10,8 @@ use App\Models\UserModel;
 class AuthService implements IAuthService {
     private IAuthRepo $authRepository;
 
-    public function __construct(IAuthRepo $authRepository) {
-        $this->authRepository = $authRepository;
+    public function __construct() {
+        $this->authRepository = new AuthRepo();
         
     }
     // Implementation of auth service methods
@@ -37,19 +38,17 @@ class AuthService implements IAuthService {
         // 4. Success
         return $user;
     }
-    public function createUser($name, $email, $password, $roleId){
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    throw new \InvalidArgumentException("Invalid email");
-    }
-
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    return $this->authRepository->createUser(
-        $name,
-        $email,
-        $hashedPassword,
-        $roleId
-    );
+    public function createUser(UserModel $user): bool
+    {
+        
+        if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+        throw new \InvalidArgumentException("Invalid email");
+        }
+        if (strlen($user->getPasswordHash()) < 6) {
+            throw new \InvalidArgumentException("Password must be at least 8 characters");
+        }
+        
+        return $this->authRepository->createUser($user);
     }
     
 }

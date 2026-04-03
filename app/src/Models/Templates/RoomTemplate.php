@@ -4,7 +4,7 @@ namespace App\Models\Templates;
 
 use App\Models\Enums\RoomType;
 
-class RoomsTemplate{
+class RoomTemplate{
     public int $id;
     public int $dungeon_id;
     public string $name;
@@ -31,6 +31,18 @@ class RoomsTemplate{
             RoomType::monster => 'monster',
             RoomType::exit => 'exit',
         };
+    }
+
+    public static function fromArray(array $data): RoomTemplate {
+        $type = isset($data['type']) ? RoomType::from((string)$data['type']) : RoomType::empty;
+        return new RoomTemplate(
+            id: isset($data['id']) ? (int)$data['id'] : 0,
+            name: $data['name'] ?? 'Unknown',
+            description: $data['description'] ?? null,
+            type: $type,
+            trapDamage: (int)$data['trap_damage'],
+            monsterId: (int)$data['monster_template']
+        );
     }
 
 }

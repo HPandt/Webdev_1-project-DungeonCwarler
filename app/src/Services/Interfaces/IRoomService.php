@@ -8,5 +8,6 @@ interface IRoomService {
     public function getRoomById(int $roomId);
     public function getNextRoom(array $currentRoom, string $dir);
     public function markDiscovered(int $roomId);
+    public function updateRoomDirection(int $roomId, string $direction, int $nextRoomId);
         
 }

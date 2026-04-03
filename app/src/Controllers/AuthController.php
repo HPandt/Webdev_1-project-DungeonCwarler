@@ -42,7 +42,7 @@ class AuthController
             $_SESSION['role'] = $user->role;
 
             // Redirect by role
-            if ($user->role === 1) {
+            if (strtolower($user->role) === 'admin') {
                 header('Location: /admin/dashboard');
             } else {
                 header('Location: /game/dashboard');

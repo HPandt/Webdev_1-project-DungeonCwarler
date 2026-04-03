@@ -1,9 +1,8 @@
 
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("GameLog loaded");
+    console.log("GameLog load...");
+    
     const log = document.getElementById('game-log');
     
     fetch("/api/game/start")
@@ -31,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', () => {
                 const direction = button.dataset.direction;
                 console.log("Button clicked:", direction);
+
                 fetch("/api/game/choose-direction", {
                     method: "POST",
                     headers: {
@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             type: 'danger',
                             text: data.error
                         });
+                        return;
                     }
                     
                     appendToLog({
@@ -71,40 +72,100 @@ document.addEventListener('DOMContentLoaded', () => {
                         type: 'info',
                         text: data.description
                     });
-                    appendToLog({
-                        type: 'info',
-                        text: 'Which way will you proceed now?'
-                    });
+
+                    console.log("Monster data:", data.monster);
+                    console.log("Has monster:", data.monster && data.monster.name);
+
+                    const attackButton = document.getElementById('attack-button');
                     
                     //avoids crashes with api changes
                     if (data.monster && data.monster.name) {
+                        console.log("Monster room - disabling movement buttons and show attack");
                         appendToLog({
                             type: 'danger',
                             text: `A ${data.monster.name} appears!`
                         });
-                    }})
+
+                        updateMonsterDisplay(data.monster);                        
+
+                        //disable movement buttons during combat
+                        document.querySelectorAll('.direction-button').forEach(btn => {
+                            console.log("Disabling button:", btn);
+                            btn.disabled = true;
+                        });
+
+                        if (attackButton) {
+                            console.log("set display to block");
+                            attackButton.style.display = 'block';
+                            attackButton.disabled = false;
+                        } else{
+                            console.log('attack btn not found');
+                        }
+
+                        //store monster data in session for combat
+                        window.currentMonster = data.monster;
+                    } else{
+                        console.log("No monster in this room");
+                        //no monster 
+                        appendToLog({
+                            type: 'info',
+                            text: 'Which way will you proceed now?'
+                        });
+                        document.querySelectorAll('.direction-button').forEach(btn => {
+                            btn.disabled = false;
+                        });
+                        
+                        if (attackButton) {
+                            attackButton.style.display = 'none';
+                        }
+                    }
+                })
                 .catch(error => {
                     console.error("Error choosing direction:", error);
                     appendToLog({
                         type: 'danger',
                         text: "An error occurred while moving. Please try again."
                     });
+                    document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = false);
                 });
             });
         });
     const attackButton = document.getElementById('attack-button');
     if (attackButton) {
         attackButton.addEventListener('click', () => {
+            console.log("Attack button clicked");
+            attackButton.disabled = true; // Disable the button immediately to prevent multiple clicks
+
             fetch("/api/game/attack", {
                 method: "POST",
+                headers:{
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}` );
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log("RAW TEXT:", text);
+                try {
+                    return JSON.parse(text);
+                } catch (error) {
+                    console.error("Error parsing JSON:", error);
+                    console.error("Response text:", text);
+                    throw error;
+                }
+            })
             .then(data => {
+                console.log("Attack response:", data); 
                 if(data.error){
                     appendToLog({
                         type: "danger",
                         text: data.error
                     });
+                    attackButton.disabled = false;
                     return;
                 }
 
@@ -125,11 +186,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, index * 150); // Delay each log line by 0ms
                     });
                 }
+                updateHpDisplay(data.playerHp, data.monsterHp);
 
                 appendToLog({
                     type: 'system',
                     text: "===================="
                 });
+                if(data.playerDefeated){
+                    appendToLog({
+                        type: 'danger',
+                        text: "You have been defeated! Better luck next time. Quit the game and try again!"
+                    });
+                    attackButton.style.display = 'none';
+                    attackButton.disabled = true;
+                    document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = true);
+                    return;
+                }
+
+
+                //check if monster is dead
+                if (data.monsterDefeated) {
+                    appendToLog({
+                        type: 'info',
+                        text: `You have defeated the ${window.currentMonster.name}!`
+                    });
+                    attackButton.style.display = 'none';
+                    attackButton.disabled = true;
+                    //get rid of monster display and show movement options
+                    clearMonsterDisplay();
+                    document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = false);
+
+                    appendToLog({
+                        type: 'info',
+                        text: 'You have survied! And must carry on! which way will you proceed now?'
+                    });
+                    window.currentMonster = null;
+                } else{
+                    attackButton.disabled = false;
+                }
             })
             .catch(error => {
                 console.error("Error attacking:", error);
@@ -137,11 +231,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     type: 'danger',
                     text: "An error occurred while attacking. Please try again."
                 });
+                attackButton.disabled = false;
             });
         });
     }
-
-   
 
     function appendToLog(text) {
         const log = document.getElementById("game-log");
@@ -162,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
         log.appendChild(div);
         log.scrollTop = log.scrollHeight; // Auto-scroll to the bottom
     }
-
     function addTurnSeparator(turn){
         appendToLog({
             type: "system",
@@ -170,3 +262,54 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 });
+
+function updateMonsterDisplay(monster) {
+    const monsterScreen = document.getElementById('monster-screen');
+    if(monsterScreen){
+        monsterScreen.innerHTML =`
+        <div class="card h-100">
+                <img
+                src="/assets/img/${monster.img}"
+                class="card-img-top monster-img"
+                
+                alt="${monster.name}"
+                >
+                <div class="card-body d-flex flex-column align-items-center">
+                    <h5 class="card-title">${monster.name}</h5>
+                    <div class="text-center">
+                        <p><strong>HP:</strong> <span id="monster-hp">${monster.currentHp}</span> / ${monster.base_hp}</p>
+                        <p><strong>Strength:</strong> ${monster.base_strength}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function clearMonsterDisplay() {
+    const monsterScreen = document.getElementById('monster-screen');
+    if(monsterScreen){
+        monsterScreen.innerHTML = `
+        <div class="text-muted text-center">
+            No enemies here.
+        </div>
+        `;
+    }
+}
+
+function updateHpDisplay(characterHp, monsterHp){
+    //if player
+    if (characterHp !== null) {
+        const playerHpElement = document.getElementById('player-hp');
+        if (playerHpElement) {
+            playerHpElement.textContent = characterHp;
+        }
+    }
+    //if monster
+    if (monsterHp !== null) {
+        const monsterHpElement = document.getElementById('monster-hp');
+        if (monsterHpElement) {
+            monsterHpElement.textContent = monsterHp;
+        }
+    }
+}

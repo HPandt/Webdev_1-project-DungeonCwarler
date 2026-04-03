@@ -7,12 +7,13 @@ use App\Models\ViewModels\CharacterViewModel;
  */
  
  ?>
-
-<div class="card shadow-sm text-center">
-    <img class="card-img-top character-img mb-3" style="height: 20rem;" 
+ <div class="row">
+    <div class="col-md-6">
+        <img class="card-img-top character-img mb-3" 
             src="/assets/img/<?php echo htmlspecialchars($character->img); ?>" 
             alt="Character Avatar">
-    <div class="card-body">
+    </div>
+    <div class="col-md-6">
         
         <h5 class="card-title">
             <?php echo htmlspecialchars($character->name); ?>
@@ -21,7 +22,9 @@ use App\Models\ViewModels\CharacterViewModel;
             <?php require __DIR__ . '/player_stats.php'; ?>
         </ul>
     </div>
-</div>
+ </div>
+
+
 
 
             

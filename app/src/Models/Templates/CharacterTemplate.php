@@ -34,6 +34,21 @@ class CharacterTemplate{
         };
     }
 
+    public static function fromArray(array $data): CharacterTemplate {
+        $class = isset($data['class']) ? CharacterClass::from((string)$data['class']) : CharacterClass::Warrior;
+    
+        return new CharacterTemplate(
+            id: isset($data['id']) ? (int)$data['id'] : 0,
+            name: $data['name'] ?? 'Unknown',
+            img: $data['img'] ?? null,
+            class: $class,
+            maxHp: (int)$data['base_hp'],
+            strength: (int)$data['base_strength'],
+            dex: (int)$data['base_dex'],
+            luck: (int)$data['base_luck']
+        );
+    }
+
 }
 
 

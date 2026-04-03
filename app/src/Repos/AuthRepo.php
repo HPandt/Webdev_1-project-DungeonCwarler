@@ -28,15 +28,18 @@ class AuthRepo extends Repository implements IAuthRepo
         );
     }
 
-    public function createUser(string $username, string $email, string $password, int $roleId=2) {
-        $sql = "INSERT INTO users (username, email, password_hash, role) VALUES (:username, :email, :password, :role)";
-        $createUser = $this->getConnection()->prepare($sql);
-        $createUser->execute([
-            'username' => $username,
-            'email' => $email,
-            'password' => $password,
-            'role' => $roleId
+    public function createUser(UserModel $user): int {
+        $hashedPassword = password_hash($user->getPasswordHash(), PASSWORD_DEFAULT);
+    
+        $sql = "INSERT INTO users (name, email, password_hash, role) 
+                VALUES (:name, :email, :password, :role)";
+        $stmt = $this->getConnection()->prepare($sql);
+        
+        return $stmt->execute([
+            ':name' => $user->name,
+            ':email' => $user->email,
+            ':password' => $hashedPassword,
+            ':role' => 'player' 
         ]);
-        return $this->getConnection()->lastInsertId();
     }
 }

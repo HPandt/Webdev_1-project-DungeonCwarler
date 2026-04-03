@@ -5,7 +5,7 @@ namespace App\Models\Templates;
 class MonsterTemplate{
     public int $id;
     public string $name;
-    public string $img;
+    public ?string $img;
      public int $hp;
     public int $strength;
     public int $dex;
@@ -19,6 +19,19 @@ class MonsterTemplate{
         $this->strength = $strength;
         $this->dex = $dex;
         $this->xp_reward = $xp_reward;
+    }
+
+    public static function fromArray(array $data): MonsterTemplate {
+        
+        return new MonsterTemplate(
+            id: isset($data['id']) ? (int)$data['id'] : 0,
+            name: $data['name'] ?? 'Unknown',
+            img: $data['img'] ?? null,
+            hp: (int)$data['base_hp'],
+            strength: (int)$data['base_strength'],
+            dex: (int)$data['base_dex'],
+            xp_reward: (int)$data['xp_reward']
+        );
     }
 
 }

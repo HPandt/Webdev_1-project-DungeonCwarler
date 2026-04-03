@@ -74,18 +74,20 @@ class GameController {
         $monster = null;
         if ($room['type'] === 'monster') {
             $monster = $this->gameService->getMonsterForRoom($room['id']);
-
-            // inject runtime HP
-            $monster->currentHp = $room['monster_current_hp'];
         }
         require __DIR__ . '/../Views/Game/dungeonpage.php';
     }
 
     public function startDungeon(){
         $dungeonId = $_SESSION['dungeon_id'] ?? null;
-
+        $characterId = $_SESSION['character_id'] ?? null;
         if(!$dungeonId){
             echo json_encode(['error' => 'Dungeon not found']);
+            exit;
+        }
+
+        if(!$characterId){
+            echo json_encode(['error' => 'Character not found']);
             exit;
         }
         $room = $this->gameService->getCurrentRoom($dungeonId);
@@ -100,6 +102,7 @@ class GameController {
         //$data = json_decode(file_get_contents("php://input"), true);
         //$direction = $data['direction'] ?? null;
         $direction = $_POST['direction'] ?? null;
+        header('Content-Type: application/json');
 
         if(!$dungeonId || !$direction){
             echo json_encode(['error' => 'Invalid move']);
@@ -112,36 +115,38 @@ class GameController {
             return;
         }   
 
+        $_SESSION['current_room_id'] = $room['roomId'];
+        $_SESSION['character_id'] = $_SESSION['character_id'] ?? null;
+
         $response = $this->gameService->buildRoomLogResponse($room['roomId']);
-        header('Content-Type: application/json');
         echo json_encode($response);
     }
 
     public function attack() {
-        $roomId = $_SESSION['current_room_id'] ?? null;
+        header('Content-Type: application/json');
+       try {
+         $roomId = $_SESSION['current_room_id'] ?? null;
         $characterId = $_SESSION['character_id'] ?? null;
+        error_log("DEBUG: roomId=$roomId, characterId=$characterId");
 
         if(!$roomId || !$characterId){
-            header('Location: /game/dungeon');
             echo json_encode(['error' => 'Session expired']);
             exit;
         }
 
         $combatResult = $this->gameService->attackMonster($characterId, $roomId);
-        header('Content-Type: application/json');
-        echo json_encode($combatResult);
-        exit;
-    }
+       $jsonResult = json_encode($combatResult);
+       if ($jsonResult === false) {
+           echo json_encode(['error' => 'Failed to encode combat result']);
+           exit;
+        }
 
-    // public function showCurrentRoom() {
-    //     $dungeonId = $_SESSION['dungeon_id'] ?? null;
-    //     if ($dungeonId) {
-    //         $currentRoomId = $this->gameService->getCurrentRoomId($dungeonId);
-    //         $room = $this->roomService->getRoomById($currentRoomId);
-    //         require(__DIR__ . '/../Views/Game/room.php');
-    //     } else {
-    //         header('Location: /start-game');
-    //         exit();
-    //     }
-    // }
+        echo $jsonResult;
+        exit;
+       } catch (\Exception $e) {
+           error_log("ERROR in attack(): " . $e->getMessage());
+           echo json_encode(['error' => 'An error occurred during combat']);
+           exit;
+       }
+    }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Repos\Interfaces;
 
+use App\Models\UserModel;
+
 interface IAuthRepo 
 {
     public function findByEmail(string $email);
-    public function createUser(string $name, string $email, string $password, int $roleId);
+    public function createUser(UserModel $user);
 }

@@ -68,23 +68,15 @@ class GameService implements IGameService {
             ];
         }
 
-        $nextRoomId = $this->gameRepository->chooseDirection($dungeonId, $direction);
-        if ($nextRoomId === null) {
+        $result = $this->gameRepository->chooseDirection($dungeonId, $direction);
+        if (!isset($result['success']) || !$result['success']) {
             return [
                 'success' => false,
                 'message' => 'You walk into a wall. You must choose another direction.'
             ];
         }
+        $nextRoomId = $result['next_room_id']; //get the id from the array
 
-        $nextRoom = $this->gameRepository->getCurrentRoomId($nextRoomId);
-        if (!$nextRoom) {
-            return [
-                'success' => false,
-                'message' => 'Next room not found.'
-            ];
-        }
-
-        $this->gameRepository->updateCurrentRoom($dungeonId, $nextRoomId);
         $this->roomRepository->markDiscovered($nextRoomId);
 
         return [
@@ -107,9 +99,9 @@ class GameService implements IGameService {
                     'name' => $monster->name,
                     'img' => $monster->img,
                     'currentHp' => $monster->currentHp,
-                    'maxHp' => $monster->maxHp,
-                    'strength' => $monster->strength,
-                    'xpReward' => $monster->xpReward
+                    'base_hp' => $monster->hp,
+                    'base_strength' => $monster->strength,
+                    'xp_reward' => $monster->xp_reward
                 ];
             }
         }
@@ -144,20 +136,33 @@ class GameService implements IGameService {
             return $result;
         }
 
-        $monsterAc = 10 + floor($monster->dex / 2);
+        //cant use object properties in json response
+        $monsterName = $monster->name;
+        $monsterDex = $monster->dex;
+        $monsterStrength = $monster->strength;
+        $monsterHp = $monster->currentHp;
+        $monsterXpReward = $monster->xp_reward;
+
+        $characterName = $character->name;
+        $characterDex = $character->dex;
+        $characterStrength = $character->strength;
+        $characterHp = $character->currentHp;
+
+        $monsterAc = 10 + floor($monsterDex / 2);
 
         // Player attacks monster
-        $playerRoll = Dice::rollWithStats($character->strength);
+        $playerRoll = Dice::rollWithStats($characterStrength);
         $playerDamage = 0;
         $playerHit = $playerRoll >= $monsterAc;
 
-        $result['log'][] = ['type' => 'attack', 'text' => "You attack the {$monster->name} with a roll of {$playerRoll} against AC {$monsterAc}."];
+        $result['log'][] = ['type' => 'attack', 'text' => "{$characterName} attack the {$monsterName} with a roll of {$playerRoll} against it's AC of {$monsterAc}."];
         if ($playerHit) {
-            $playerDamage = Dice::damage(1, 8) + floor($character->strength / 2);
+            $playerDamage = Dice::damage(1, 8) + floor($characterStrength / 2);
             $this->gameRepository->damageMonster($roomId, $playerDamage);
-            $result['log'][] = ['type' => 'hit', 'text' => "Your attack hits and deals {$playerDamage} damage!"];
+
+            $result['log'][] = ['type' => 'hit', 'text' => "{$characterName} attack hits and deals {$playerDamage} damage!"];
         } else {
-            $result['log'][] = ['type' => 'miss', 'text' => "Your attack misses!"];
+            $result['log'][] = ['type' => 'miss', 'text' => "{$characterName} attack misses!"];
         }
 
         $result['playerAttack'] =[
@@ -167,43 +172,43 @@ class GameService implements IGameService {
             'playerHit' => $playerHit,      
         ];
 
-        // Refresh monster data after damage
-        $monster = $this->gameRepository->getMonsterForRoom($roomId); 
         //Checks if monster is dead and add xp
         if(!$this->gameRepository->checkIfMonsterIsAlive($roomId)){
 
-            $xpGained = $monster->xpReward;
+            $xpGained = $monsterXpReward;
+            $result['monsterDefeated'] = true;
+            $result['xpGained'] = (int)$xpGained;
+            $result['monsterHp'] = 0;
+            $result['characterHp'] = (int)$characterHp; 
 
             $this->gameRepository->addXP($characterId, $xpGained);
             $this->gameRepository->clearMonsterFromRoom($roomId);
-            
-            $result['monsterDefeated'] = true;
-            $result['xpGained'] = $xpGained;
-            $result['monsterHp'] = 0;
-            $result['characterHp'] = $character->currentHp; 
 
-            $result['log'][] = ['type' => 'win', 'text' => "You defeated the {$monster->name} and gained {$xpGained} XP!"];
+            $result['log'][] = ['type' => 'win', 'text' => "You defeated the {$monsterName} and gained {$result['xpGained']} XP!"];
             $result['log'][] = ['type' => 'info', 'text' => "Now you may proceed to the next room."];
             return $result;
         }
-
-        $result['monsterHp'] = $monster->currentHp;
-        $result['log'][] = ['type' => 'info', 'text' => "The {$monster->name} has {$monster->currentHp} HP remaining."];
+         // Refresh monster data after damage
+        $monster = $this->gameRepository->getMonsterForRoom($roomId); 
+        $monsterHp = $monster->currentHp; // Update monster HP after damage
+        $result['monsterHp'] = (int)$monsterHp;
+        $result['log'][] = ['type' => 'info', 'text' => "The {$monsterName} has {$result['monsterHp']} HP remaining."];
 
         // Monster attacks player
-        $monsterRoll = Dice::rollWithStats($monster->strength);
+        $monsterRoll = Dice::rollWithStats($monsterStrength);
         $monsterDamage = 0;
-        $playerAc = 10 + floor($character->dex / 2);
+        $playerAc = 10 + floor($characterDex / 2);
 
-        $result['log'][] = ['type' => 'attack', 'text' => "The {$monster->name} attacks you with a roll of {$monsterRoll} against your AC of {$playerAc}."];
+        $result['log'][] = ['type' => 'attack', 'text' => "The {$monsterName} attacks {$characterName} with a roll of {$monsterRoll} against {$characterName} AC of {$playerAc}."];
 
         $monsterHit = $monsterRoll >= $playerAc;
         if ($monsterHit) {
-            $monsterDamage = Dice::damage(1, 6) + floor($monster->strength / 2);
+            $monsterDamage = Dice::damage(1, 6) + floor($monsterStrength / 2);
             $this->gameRepository->damageCharacter($characterId, $monsterDamage);
-            $result['log'][] = ['type' => 'hit', 'text' => "The {$monster->name}'s attack hits and deals {$monsterDamage} damage!"];
+            $characterHp = $character->currentHp; // Update character HP after damage
+            $result['log'][] = ['type' => 'hit', 'text' => "The {$monsterName}'s attack hits and deals {$monsterDamage} damage!"];
         }else {
-            $result['log'][] = ['type' => 'miss', 'text' => "The {$monster->name}'s attack misses!"];
+            $result['log'][] = ['type' => 'miss', 'text' => "The {$monsterName}'s attack misses!"];
         }
 
         $result['monsterAttack'] = [
@@ -214,18 +219,17 @@ class GameService implements IGameService {
             'damageDealt' => $monsterDamage
         ];
 
-        $character = $this->gameRepository->getCharacterById($characterId); // Refresh character data
+        //$character = $this->gameRepository->getCharacterById($characterId); // Refresh character data
         // Check if player is defeated
         if(!$this->gameRepository->checkIfCharacterIsAlive($characterId)){
             $result['playerDefeated'] = true;
             $result['characterHp'] = 0;
-
             $result['log'][] = ['type' => 'gameOver', 'text' => "You have been defeated by the {$monster->name}... All is lost, and you fade into the abyss. Game Over."];
             return $result;
         }
 
-        $result['characterHp'] = $character->currentHp;
-        $result['log'][] = ['type' => 'info', 'text' => "You have {$character->currentHp} HP remaining."];
+        $result['characterHp'] = (int)$characterHp;
+        $result['log'][] = ['type' => 'info', 'text' => "You have {$result['characterHp']} HP remaining."];
 
         return $result;
     }

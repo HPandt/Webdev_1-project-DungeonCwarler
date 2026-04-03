@@ -6,9 +6,11 @@
             <button class="btn btn-secondary direction-button" id="east-btn">East</button>
             <button class="btn btn-secondary direction-button" id="west-btn">West</button>
         </div>
+        
+    </div>
+    <div class="col-4">
         <div class="col-4">
             <button class="btn btn-primary action-button" id="attack-btn">Attack</button>
         </div>
     </div>
 </div>
-<script src="/js/actionButtons.js"></script>

@@ -8,40 +8,51 @@
     </div>
 <?php endif; ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-4">
-            <?php require_once(__DIR__ . '/../partials/player_screen.php'); ?>
+<div class="container-fluid d-flex flex-column p-2" style="height: 100vh;">
+
+    <!-- TOP ROW -->
+    <div class="row flex-fill min-h-0">
+        <!-- Monster -->
+        <div class="col-md-3 d-flex flex-column min-h-0">
+            <?php require_once(__DIR__ . '/../partials/monster_screen.php'); ?>
         </div>
-        <div class="col-md-8">  
-            <div class="shadow-sm">
-                <div class="">
-                    Dungeon Log
-                </div>
-                <div id="game-log" class="card-body game-log">
+
+        <!-- Game Log -->
+        <div class="col-md-9 d-flex flex-column min-h-0">
+            <div class="shadow-sm h-100 d-flex flex-column min-h-0">
+                
+                <div id="game-log" class="game-log flex-grow-1 overflow-auto">
                 </div>
             </div>
-            <div class="text-center">
+        </div>
+    </div>
 
-                <button class="btn btn-secondary direction-button" data-direction="north">North</button>
+    <!-- BOTTOM ROW -->
+    <div class="row flex-fill min-h-0">
+        <!-- Player -->
+        <div class="col-md-7 d-flex flex-column min-h-0">
+            <?php require_once(__DIR__ . '/../partials/player_screen.php'); ?>
+        </div>
+        <div class="col-md-5 d-flex flex-column justify-content-center align-items-center min-h-0">
+            <!-- Actions -->
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
 
-                <div class="my-2">
-                    <button class="btn btn-secondary direction-button" data-direction="west">West</button>
-                    <button class="btn btn-secondary direction-button" data-direction="east">East</button>
-                </div>
+                <button class="btn btn-outline-primary direction-button" data-direction="north">North</button>
+                <button class="btn btn-outline-primary direction-button" data-direction="west">West</button>
+                <button class="btn btn-outline-primary direction-button" data-direction="east">East</button>
+                <button class="btn btn-outline-primary direction-button" data-direction="south">South</button>
 
-                <button class="btn btn-secondary direction-button" data-direction="south">South</button>
-
-                <hr>
-
-                <button id="attack-button" class="btn btn-primary">
+                <button id="attack-button" style="display: none;" class="btn btn-danger">
                     Attack
                 </button>
 
             </div>
         </div>
-    </div>
-</div>
 
-<?php require_once(__DIR__ . '/../partials/footer.php'); ?>
+        
+    </div>
+
+</div>
 <script src="/assets/js/gameLog.js"></script>
+<?php require_once(__DIR__ . '/../partials/footer.php'); ?>
+

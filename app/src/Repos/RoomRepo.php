@@ -22,21 +22,47 @@ class RoomRepo extends Repository implements IRoomRepo{
     }
 
     public function markDiscovered(int $roomId) {
-        $sql = "UPDATE Rooms SET is_discovered = 1 WHERE id = ?";
+        $sql = "UPDATE Rooms SET discovered = 1 WHERE id = ?";
         $setMarked = $this->getConnection()->prepare($sql);
         return $setMarked->execute([$roomId]);
     }
 
     public function createRoomFromTemplate(int $dungeonId, int $templateId)
     {
+        //get template to check if it has monster and get monster hp
+        $templateSql = "SELECT * FROM RoomTemplate WHERE id = ?";
+        $getTemplate = $this->getConnection()->prepare($templateSql);
+        $getTemplate->execute([$templateId]);
+        $template = $getTemplate->fetch(\PDO::FETCH_ASSOC);
+        if(!$template){
+            return null;
+        }
+
+        //get data if room has monster in the template
+        $monsterTempId = $template['monster_template'];
+        $monsterCurrentHp = null;
+        if ($monsterTempId) {
+            //get monster base hp from said template
+            $monsterSql = "SELECT base_hp FROM MonsterTemplate WHERE id = ?";
+            $getMonster = $this->getConnection()->prepare($monsterSql);
+            $getMonster->execute([$monsterTempId]);
+            $monster = $getMonster->fetch(\PDO::FETCH_ASSOC);
+            if ($monster) {
+                //setcurrent hp to base, this is what the game will use to track its hp 
+                $monsterCurrentHp = $monster['base_hp']; 
+            }
+        }
+
         $sql = "
-            INSERT INTO Rooms (dungeon_id, room_temp_id, discovered)
-            VALUES (:dungeonId, :templateId, 1)
+            INSERT INTO Rooms (dungeon_id, room_temp_id, discovered, monster_temp_id, monster_current_hp)
+            VALUES (:dungeonId, :templateId, 1, :monsterTempId, :monsterCurrentHp)
         ";  
         $stmt = $this->connect()->prepare($sql);
         if (!$stmt->execute([
             'dungeonId' => $dungeonId,
-            'templateId' => $templateId
+            'templateId' => $templateId,
+            'monsterTempId' => $monsterTempId,
+            'monsterCurrentHp' => $monsterCurrentHp
         ])) {
             var_dump($stmt->errorInfo());
             die();
@@ -47,5 +73,15 @@ class RoomRepo extends Repository implements IRoomRepo{
         // ]);
         $roomId = $this->getConnection()->lastInsertId();
         return $this->getRoomById($roomId);
+    }
+
+    public function updateRoomDirection(int $roomId, string $direction, int $nextRoomId) {
+    $directionColumn = $direction . '_room_id';    
+    $sql = "UPDATE Rooms SET {$directionColumn} = :nextRoomId WHERE id = :roomId";
+        $stmt = $this->getConnection()->prepare($sql);
+        return $stmt->execute([
+            'nextRoomId' => $nextRoomId,
+            'roomId' => $roomId
+        ]);
     }
 }

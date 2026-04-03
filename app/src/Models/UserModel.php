@@ -22,6 +22,17 @@ class UserModel{
         $this->role = $role;
     }
 
+    public static function fromArray(array $data): UserModel {
+        
+        return new UserModel(
+            id: isset($data['id']) ? (int)$data['id'] : 0,
+            name: $data['name'] ?? 'Unknown',
+            email: $data['email'] ?? 'Unknown',
+            password_hash: $data['password_hash'] ?? '',
+            role: $data['role'] ?? 'user'
+        );
+    }
+
     public function getPasswordHash(): string {
         return $this->password_hash;
     }

@@ -8,5 +8,6 @@ interface IRoomRepo{
     public function markDiscovered(int $roomId);
 
     public function createRoomFromTemplate(int $dungeonId, int $templateId);
+    public function updateRoomDirection(int $roomId, string $direction, int $nextRoomId);
         
 }

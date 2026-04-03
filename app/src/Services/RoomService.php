@@ -20,5 +20,8 @@ class RoomService implements IRoomService {
     public function markDiscovered(int $roomId) {
         return $this->roomRepository->markDiscovered($roomId);
     }
+    public function updateRoomDirection(int $roomId, string $direction, int $nextRoomId) {
+        return $this->roomRepository->updateRoomDirection($roomId, $direction, $nextRoomId);
+    }
     
 }
