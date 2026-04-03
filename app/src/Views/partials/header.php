@@ -17,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-3 border-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Dungeon Crawler</a>
+        <h1 class="navbar-brand">Dungeon Crawler</h1>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>

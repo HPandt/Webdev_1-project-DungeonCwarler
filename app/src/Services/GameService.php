@@ -1,7 +1,8 @@
 <?php 
 
 namespace App\Services;
-
+use App\Repos\GameRepo;
+use App\Repos\RoomRepo;
 use App\Repos\Interfaces\IGameRepo;
 use App\Services\Interfaces\IGameService;
 use App\Repos\Interfaces\IRoomRepo;
@@ -10,9 +11,9 @@ use App\Core\Dice;
 class GameService implements IGameService {
     private IGameRepo $gameRepository;
     private IRoomRepo $roomRepository;
-    public function __construct(IGameRepo $gameRepository, IRoomRepo $roomRepository) {
-        $this->gameRepository = $gameRepository;
-        $this->roomRepository = $roomRepository;
+    public function __construct() {
+        $this->gameRepository = new GameRepo();
+        $this->roomRepository = new RoomRepo();
     } 
     /* ===== Game Start ===== */
    

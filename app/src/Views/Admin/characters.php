@@ -9,7 +9,7 @@
 
 <div class="container mt-5 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold text-dark">Characters Template</h1>
+        <h1 class="fw-bold text-light">Characters Template</h1>
         <a href="/admin/characters/create" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Create New Character
         </a>
@@ -22,7 +22,7 @@
     <?php else: ?>
         <div class="table-responsive">
 
-            <table class="table table-primary" border="1">
+            <table class="table table-hover table-striped align-middle" border="1">
                 <thead class="table-light">
                     <tr>
                         <th>Name</th>

@@ -301,6 +301,7 @@ function updateHpDisplay(characterHp, monsterHp){
     //if player
     if (characterHp !== null) {
         const playerHpElement = document.getElementById('player-hp');
+        console.log("Updating player HP display:", characterHp);
         if (playerHpElement) {
             playerHpElement.textContent = characterHp;
         }

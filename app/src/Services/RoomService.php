@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Repos\Interfaces\IRoomRepo;
+use App\Repos\RoomRepo;
 use App\Services\Interfaces\IRoomService;
 
 class RoomService implements IRoomService {
     private IRoomRepo $roomRepository;
-    public function __construct(IRoomRepo $roomRepository) {
-        $this->roomRepository = $roomRepository;
+    public function __construct() {
+        $this->roomRepository = new RoomRepo();
     }
     // Implementation of room service methods
     public function getRoomById(int $roomId) {

@@ -192,7 +192,7 @@ public function generateDungeon($characterId, $startingRoomId) {
 
     public function addXP( int $characterId, int $roomId) {
         // When player defeats monster use experice points from right monster here xpamount
-        $sql = "UPDATE Characters c JOIN Rooms r ON r.id = :roomId JOIN MonsterTemplate m ON m.id = r.monster_template_id SET c.xp = c.xp + m.xp_reward WHERE c.id = :characterId";
+        $sql = "UPDATE Characters c JOIN Rooms r ON r.id = :roomId JOIN MonsterTemplate m ON m.id = r.monster_temp_id SET c.xp = c.xp + m.xp_reward WHERE c.id = :characterId";
         $addXp = $this->getConnection()->prepare($sql);
         $addXp->execute([
             ':roomId' => $roomId,
@@ -215,15 +215,15 @@ public function generateDungeon($characterId, $startingRoomId) {
         $sql = "SELECT current_hp FROM Characters WHERE id = :characterId";
         $checkHp = $this->getConnection()->prepare($sql);
         $checkHp->execute([':characterId' => $characterId]);
-        return ((int)$checkHp->fetchColumn()) >= 0;
+        return ((int)$checkHp->fetchColumn()) > 0;
 
     }
 
     public function clearMonsterFromRoom(int $roomId) {
         // Implementation here
-        $sql = "UPDATE Rooms SET monster_template_id = NULL, monster_current_hp = NULL, type ='empty' WHERE id = :roomId";
+        $sql = "UPDATE Rooms SET monster_temp_id = NULL, monster_current_hp = NULL WHERE id = :roomId";
         $clearMonster = $this->getConnection()->prepare($sql);
-        $clearMonster->execute([$roomId]);
+        $clearMonster->execute([':roomId' => $roomId]);
     }
 
     public function damageMonster(int $roomId,int $damage) {
@@ -242,7 +242,7 @@ public function generateDungeon($characterId, $startingRoomId) {
         $checkHp = $this->getConnection()->prepare($sql);
         $checkHp->execute([':roomId' => $roomId]);
         //this converts it into an int and checks if the life is 0 or less returning then true or false
-        return ((int)$checkHp->fetchColumn()) >= 0;
+        return ((int)$checkHp->fetchColumn()) > 0;
     }
     public function getCurrentRoom(int $dungeonId) {
         // Implementation here
@@ -266,15 +266,18 @@ public function generateDungeon($characterId, $startingRoomId) {
 
     public function updateCurrentRoom(int $dungeonId, int $roomId) {
         // Implementation here
-        $sql = "UPDATE Dungeon SET current_room_id = ? WHERE id = ?";
+        $sql = "UPDATE Dungeon SET current_room_id = :roomId WHERE id = :dungeonId";
         $updateRoom = $this->getConnection()->prepare($sql);
-        $updateRoom->execute([$roomId, $dungeonId]);
+        $updateRoom->execute([
+            ':roomId' => $roomId,
+            ':dungeonId' => $dungeonId
+        ]);
     }
     public function getCurrentRoomId(int $dungeonId) {
         // Implementation here
-        $sql = "SELECT current_room_id FROM Dungeon WHERE id = ?";
+        $sql = "SELECT current_room_id FROM Dungeon WHERE id = :dungeonId";
         $getRoomId = $this->getConnection()->prepare($sql);
-        $getRoomId->execute([$dungeonId]);
+        $getRoomId->execute([':dungeonId' => $dungeonId]);
         $result = $getRoomId->fetch(\PDO::FETCH_ASSOC);
         return $result ? (int)$result['current_room_id'] : null;
     }

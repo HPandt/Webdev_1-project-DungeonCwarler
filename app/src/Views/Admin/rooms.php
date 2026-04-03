@@ -32,7 +32,7 @@
                     <tr>
                         <td><?= htmlspecialchars($room->name) ?? '' ?></td>
                         <td><?= htmlspecialchars($room->type->value) ?? '' ?></td>
-                        <td><?= htmlspecialchars($room->description) ?? '' ?></td>
+                        <td><?= substr(strip_tags($room->description) ?? '', 0, 20) ?>...</td>
                         <td>
                             <a class="btn btn-success" href="/admin/rooms/edit/<?= $room->id ?>">Edit</a>
                             <form action="/admin/rooms/delete/<?= $room->id ?>" method="POST" style="display: inline;">

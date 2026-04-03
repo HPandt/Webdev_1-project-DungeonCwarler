@@ -17,13 +17,10 @@ class GameController {
     private RoomService $roomService;
 
     public function __construct() {
-        $gameRepo = new GameRepo();
-        $roomRepo = new RoomRepo();
-        $adminRepo = new AdminRepo();
 
-        $this->gameService = new GameService($gameRepo, $roomRepo);
-        $this->roomService = new RoomService($roomRepo);
-        $this->adminService = new AdminService($adminRepo);
+        $this->gameService = new GameService();
+        $this->roomService = new RoomService();
+        $this->adminService = new AdminService();
     }
 
     // Controller methods to handle game actions
@@ -145,7 +142,11 @@ class GameController {
         exit;
        } catch (\Exception $e) {
            error_log("ERROR in attack(): " . $e->getMessage());
-           echo json_encode(['error' => 'An error occurred during combat']);
+           echo json_encode(['error' => 'An error occurred during combat: ' . $e->getMessage()]);
+           exit;
+       } catch (\Throwable $err) {
+           error_log("ERROR in attack(): " . $err->getMessage());
+           echo json_encode(['error' => 'A critical error occurred during combat: ' . $err->getMessage()]);
            exit;
        }
     }
