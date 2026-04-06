@@ -93,6 +93,10 @@ class GameService implements IGameService {
             'type' => $room['type']
         ];
 
+        if($room['exit']){
+            $data['exit'] = true;
+        }
+
         if ($room['type'] === 'monster') {
             $monster = $this->gameRepository->getMonsterForRoom($roomId);
             if ($monster) {

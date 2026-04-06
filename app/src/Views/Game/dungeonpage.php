@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-5 d-flex flex-column justify-content-center align-items-center min-h-0">
             <!-- Actions -->
-            <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <div id="action-buttons" class="d-flex justify-content-center gap-3 flex-wrap">
 
                 <button class="btn btn-outline-primary direction-button" data-direction="north">North</button>
                 <button class="btn btn-outline-primary direction-button" data-direction="west">West</button>
@@ -48,11 +48,7 @@
 
             </div>
         </div>
-
-        
     </div>
-
 </div>
 <script src="/assets/js/gameLog.js"></script>
-<?php require_once(__DIR__ . '/../partials/footer.php'); ?>
 

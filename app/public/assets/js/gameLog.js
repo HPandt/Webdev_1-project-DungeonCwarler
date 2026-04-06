@@ -202,7 +202,62 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = true);
                     return;
                 }
+                
+                // CHECK IF EXIT ROOM
+                if (data.type === 'exit') {
+                    appendToLog({
+                        type: 'success',
+                        text: '✨ You have escaped the dungeon! You have won! ✨ Congratulations on your victory! 🎉 You are a true adventurer!'
+                    });
+                    
+                    // Disable all buttons
+                    document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = true);
+                    attackButton.style.display = 'none';
+                    
+                    // Create exit game button
+                    const exitButton = document.createElement('button');
+                    exitButton.className = 'btn btn-success mt-3';
+                    exitButton.textContent = 'Exit Game';
+                    exitButton.onclick = () => {
+                        window.location.href = '/game/dashboard';
+                    };
+                    
+                    const buttonContainer = document.querySelector('.d-flex.justify-content-center');
+                    if (buttonContainer) {
+                        buttonContainer.innerHTML = '';
+                        buttonContainer.appendChild(exitButton);
+                    }
+                    
+                    clearMonsterDisplay();
+                    return;
+                }
 
+                if (data.playerDefeated) {
+                    appendToLog({
+                        type: 'danger',
+                        text: "You have been defeated! Better luck next time. Quit the game and try again!"
+                    });
+                    attackButton.style.display = 'none';
+                    attackButton.disabled = true;
+                    document.querySelectorAll('.direction-button').forEach(btn => btn.disabled = true);
+                    
+                     // Create exit game button
+                    const exitButton = document.createElement('button');
+                    exitButton.className = 'btn btn-success mt-3';
+                    exitButton.textContent = 'Exit Game';
+                    exitButton.onclick = () => {
+                        window.location.href = '/game/dashboard';
+                    };
+                    
+                    const buttonContainer = document.querySelector('.d-flex.justify-content-center');
+                    if (buttonContainer) {
+                        buttonContainer.innerHTML = '';
+                        buttonContainer.appendChild(exitButton);
+                    }
+                    
+                    clearMonsterDisplay();
+                    return;
+                }
 
                 //check if monster is dead
                 if (data.monsterDefeated) {
