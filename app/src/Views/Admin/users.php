@@ -12,6 +12,9 @@ use App\Models\UserModel;
         <a href="/admin/users/create" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Create New User
         </a>
+        <a href="/admin/dashboard" class="btn btn-success btn-lg ms-2">
+            <i class="bi bi-plus-circle"></i> Go back
+        </a>
     </div><?php if(empty($users)): ?>
         <div class="alert alert-info text-center py-5">
             <p class="fs-5">No users found. <a href="/admin/users/create">Create one</a></p>

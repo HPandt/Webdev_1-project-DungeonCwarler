@@ -13,6 +13,9 @@
         <a href="/admin/characters/create" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Create New Character
         </a>
+        <a href="/admin/dashboard" class="btn btn-success btn-lg ms-2">
+            <i class="bi bi-plus-circle"></i> Go back
+        </a>
     </div>
 
     <?php if(empty($characters)): ?>

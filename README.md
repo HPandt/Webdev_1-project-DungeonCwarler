@@ -1,6 +1,6 @@
 # Webdev_1-project-DungeonCwarler
 
-Login Credentials 
+Login Credentials:
 Admin - 
 admin@admin.nl
 password: qwerty
@@ -12,5 +12,11 @@ password: qwerty
 
 top exit game btn does not work, it is a feature for web dev 2. end game appears when user dies or exit is found
 
-Concernning Ai 
-it was used to help design the and make the front-end and with error checking and fixing. espescially with the JS 
+To Play:
+First choose a character there upon you will wake up in a new dungeon that traks current room, and loop through a random number in a list for each direction you go, you must survive the monster encounters if you are not lucky and find the exit or die trying. combat is purely based on chance. with an unseen dice roll.
+
+Ai disclosure: 
+AI was used to update and help create the views to fit a more rpg retro style and it was used with error checking, debugging and helping with problem solving. And the thought process/flow of the game. It was just copy and paste during the development of this game.
+
+I worked on the back-end with guidance and help with over complicated features/functions. And for the js as the further the project got the more complicated it was so there were alot of errors and problems like the game not registering the movement or after a few rounds the battle showed errors instead of continuing (turns out it was not able to check living status), i needed to debug which was difficult by myself.
+

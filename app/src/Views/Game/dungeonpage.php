@@ -1,8 +1,6 @@
-
-
 <?php require_once(__DIR__ . '/../partials/header.php'); ?>
 
-<?php if(!empty($_GET['error'])): ?>
+<?php if (!empty($_GET['error'])): ?>
     <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($_GET['error']); ?>
     </div>
@@ -20,7 +18,7 @@
         <!-- Game Log -->
         <div class="col-md-9 d-flex flex-column min-h-0">
             <div class="shadow-sm h-100 d-flex flex-column min-h-0">
-                
+
                 <div id="game-log" class="game-log flex-grow-1 overflow-auto">
                 </div>
             </div>
@@ -51,4 +49,3 @@
     </div>
 </div>
 <script src="/assets/js/gameLog.js"></script>
-

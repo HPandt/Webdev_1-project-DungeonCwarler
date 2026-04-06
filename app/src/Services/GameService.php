@@ -87,13 +87,19 @@ class GameService implements IGameService {
     }
     public function buildRoomLogResponse(int $roomId) {
         $room = $this->roomRepository->getRoomById($roomId);
+        if (!$room || empty($room['name']) || empty($room['description']) || empty($room['type'])) {
+            return [
+                'error' => 'Room data is missing or invalid.',
+            ];
+        }
+
         $data = [
             'roomName' => $room['name'],
             'description' => $room['description'],
             'type' => $room['type']
         ];
 
-        if($room['exit']){
+        if ($room['type'] === 'exit') {
             $data['exit'] = true;
         }
 
@@ -133,10 +139,12 @@ class GameService implements IGameService {
             'playerDefeated' => false,
             'xpGained' => 0,
             'monsterHp' => null,
-            'characterHp' => null
+            'playerHp' => null,
+            'error' => null
         ];
 
         if (!$character || !$monster) {
+            $result['error'] = 'Character or monster not found.';
             $result['log'][] = ['type' => 'info', 'text' => "Error: Character or monster not found."];
             return $result;
         }
@@ -184,7 +192,7 @@ class GameService implements IGameService {
             $result['monsterDefeated'] = true;
             $result['xpGained'] = (int)$xpGained;
             $result['monsterHp'] = 0;
-            $result['characterHp'] = (int)$characterHp; 
+            $result['playerHp'] = (int)$characterHp; 
 
             $this->gameRepository->addXP($characterId, $xpGained);
             $this->gameRepository->clearMonsterFromRoom($roomId);
@@ -210,6 +218,7 @@ class GameService implements IGameService {
         if ($monsterHit) {
             $monsterDamage = Dice::damage(1, 6) + floor($monsterStrength / 2);
             $this->gameRepository->damageCharacter($characterId, $monsterDamage);
+            $character = $this->gameRepository->getCharacterById($characterId); // Refresh character data after damage
             $characterHp = $character->currentHp; // Update character HP after damage
             $result['log'][] = ['type' => 'hit', 'text' => "The {$monsterName}'s attack hits and deals {$monsterDamage} damage!"];
         }else {
@@ -228,13 +237,13 @@ class GameService implements IGameService {
         // Check if player is defeated
         if(!$this->gameRepository->checkIfCharacterIsAlive($characterId)){
             $result['playerDefeated'] = true;
-            $result['characterHp'] = 0;
+            $result['playerHp'] = 0;
             $result['log'][] = ['type' => 'gameOver', 'text' => "You have been defeated by the {$monster->name}... All is lost, and you fade into the abyss. Game Over."];
             return $result;
         }
 
-        $result['characterHp'] = (int)$characterHp;
-        $result['log'][] = ['type' => 'info', 'text' => "You have {$result['characterHp']} HP remaining."];
+        $result['playerHp'] = (int)$characterHp;
+        $result['log'][] = ['type' => 'info', 'text' => "You have {$result['playerHp']} HP remaining."];
 
         return $result;
     }
