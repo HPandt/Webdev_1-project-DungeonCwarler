@@ -15,12 +15,15 @@
     : "/admin/characters/create";
   ?>
  <?php require_once(__DIR__ . '/../../partials/header.php'); ?>
- <a href="/admin/characters" class="btn btn-success btn-lg ms-2 mt-3">
-   <i class="bi bi-plus-circle"></i> Back to Characters
- </a>
+ <div class="ms-2 mt-3">
+   <a href="/admin/characters" class="btn btn-success btn-lg ">
+     <i class="bi bi-plus-circle"></i> Back to Characters
+   </a>
+ </div>
+
  <div class="container d-flex justify-content-center mb-3 mt-3 text-dark border-radius-10 p-8 ">
-   <div class="card shadow p-4" style="max-width: 600px; width: 100%;">
-     <form class="form" method="POST" action="<?php echo $formAction; ?>">
+   <div class="card card-form  shadow p-4" style="max-width: 600px; width: 100%;">
+     <form class="form" method="POST" action="<?php echo $formAction; ?>" enctype="multipart/form-data">
        <?php if ($isEdit): ?>
          <input type="hidden" name="id" value="<?php echo $character->id; ?>">
        <?php endif; ?>
@@ -50,6 +53,14 @@
        <input type="number" name="base_luck"
          value="<?= htmlspecialchars($character->luck ?? '') ?>"
          placeholder="Base Luck" required class="form-control mb-2">
+
+       <label class="form-label" for="img">Image:</label>
+       <?php if ($isEdit && !empty($character->img)): ?>
+         <div class="mb-2">
+           <img src="/assets/img/<?php echo htmlspecialchars($character->img); ?>" alt="<?= htmlspecialchars($character->name) ?>" class="img-fluid mb-2" style="max-height: 200px;" />
+         </div>
+       <?php endif; ?>
+       <input type="file" name="img" accept="image/*" class="form-control mb-2">
 
        <label class="form-label" for="class">Choose Class:</label>
        <select name="class" class="form-control mb-2" required>

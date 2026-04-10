@@ -15,11 +15,14 @@
     : "/admin/rooms/create";
   ?>
  <?php require_once(__DIR__ . '/../../partials/header.php'); ?>
- <a href="/admin/rooms" class="btn btn-success btn-lg ms-2 mt-3">
-   <i class="bi bi-plus-circle"></i> Back to Rooms
- </a>
+ <div class="ms-2 mt-3">
+   <a href="/admin/rooms" class="btn btn-success btn-lg ">
+     <i class="bi bi-plus-circle"></i> Back to Rooms
+   </a>
+ </div>
+
  <div class="container d-flex justify-content-center mb-3 mt-3 text-dark border-radius-10 p-8">
-   <div class="card shadow p-4" style="max-width: 600px; width: 100%;">
+   <div class="card card-form shadow p-4" style="max-width: 600px; width: 100%;">
      <form class="form" method="POST" action="<?php echo $formAction; ?>">
        <?php if ($isEdit): ?>
          <input type="hidden" name="id" value="<?php echo $room->id; ?>">
@@ -36,8 +39,8 @@
          value="<?= htmlspecialchars($room->description ?? '') ?>"
          placeholder="Description" required class="form-control mb-2">
 
-       <label for="trapDamage">Trap Damage:</label>
-       <input type="number" name="trapDamage"
+       <label for="trap_damage">Trap Damage:</label>
+       <input type="number" name="trap_damage"
          value="<?= htmlspecialchars($room->trapDamage ?? '') ?>"
          placeholder="Trap Damage" class="form-control mb-2">
 
@@ -52,8 +55,8 @@
          <?php endforeach; ?>
        </select>
 
-       <label for="monsterId">Monster:</label>
-       <select name="monsterId" class="form-control mb-2">
+       <label for="monster_template">Monster:</label>
+       <select name="monster_template" class="form-control mb-2">
          <option value="">Select Monster</option>
          <option value="">No monster</option>
          <?php foreach ($monsters as $monster): ?>

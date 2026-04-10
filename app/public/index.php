@@ -16,10 +16,6 @@ use function FastRoute\simpleDispatcher;
  * Define the routes for the application.
  */
 $dispatcher = simpleDispatcher(function (RouteCollector $r) {
-    // $r->addRoute('GET', '/', ['App\Controllers\ArticleController', 'index']);
-    // $r->addRoute('GET', '/api/articles', ['App\Controllers\ArticleController', 'apiGetAll']);
-    // $r->addRoute('POST', '/api/articles', ['App\Controllers\ArticleController', 'apiCreate']);
-
     // Auth routes
     $r->addRoute('GET', '/', ['App\Controllers\AuthController', 'loginForm']);
     $r->addRoute('POST', '/login', ['App\Controllers\AuthController', 'login']);
@@ -55,7 +51,6 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
     $r->addRoute('GET', '/admin/monsters/edit/{id:\d+}', ['App\Controllers\AdminController', 'editMonsterTemplate']);
     $r->addRoute('POST', '/admin/monsters/update', ['App\Controllers\AdminController', 'updateMonsterTemplate']);
     $r->addRoute(['POST','GET'], '/admin/monsters/delete/{id:\d+}', ['App\Controllers\AdminController', 'deleteMonsterTemplate']);
-
     // User routes
     $r->addRoute('GET', '/admin/users', ['App\Controllers\AdminController', 'showUsers']);
     $r->addRoute('GET', '/admin/users/create', ['App\Controllers\AdminController', 'showUserForm']);
@@ -67,7 +62,6 @@ $dispatcher = simpleDispatcher(function (RouteCollector $r) {
 
     //Api routes
     $r->addRoute('GET', '/api/game/start', ['App\Controllers\GameController', 'startDungeon']);
-    //$r->addRoute('GET', '/api/game/choose-direction', ['App\Controllers\GameController', 'chooseDirection']);
     $r->addRoute(['POST', 'GET'], '/api/game/choose-direction', ['App\Controllers\GameController', 'chooseDirection']);
     $r->addRoute(['POST','GET'], '/api/game/attack', ['App\Controllers\GameController', 'attack']);
     

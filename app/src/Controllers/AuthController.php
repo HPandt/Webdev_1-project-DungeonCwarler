@@ -2,11 +2,10 @@
 
 namespace App\Controllers;
 
-
 use App\Core\Repository;
-use App\Repos\AdminRepo;
-use App\Repos\AuthRepo;
+use App\Exceptions\UserFacingException;
 use App\Services\AuthService;
+use App\Models\Enums\Roles;
 use App\Models\UserModel;
 
 class AuthController
@@ -15,8 +14,7 @@ class AuthController
     private AuthService $authService;
     public function __construct()
     {
-       $authRepo = new AuthRepo();
-        $this->authService = new AuthService($authRepo);
+        $this->authService = new AuthService();
     }
 
     public function loginForm()
@@ -42,7 +40,7 @@ class AuthController
             $_SESSION['role'] = $user->role;
 
             // Redirect by role
-            if (strtolower($user->role) === 'admin') {
+            if (strtolower($user->role->value) === 'admin') {
                 header('Location: /admin/dashboard');
             } else {
                 header('Location: /game/dashboard');
@@ -60,25 +58,26 @@ class AuthController
     }
 
     public function register(){
-        $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
+        try {
+            $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
 
-        if(empty($username) || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 6){
-            $error = "Please provide valid registration details.";
-            require(__DIR__ . '/../Views/Auth/register.php');
-            return;
+            $user = new UserModel(
+                id: 0,
+                name: $username,
+                email: $email,
+                password_hash: $password,
+                role: Roles::player
+            );
+
+            $this->authService->createUser($user);
+
+            header('Location: /');
+            exit();
+        } catch (UserFacingException $th) {
+            throw new UserFacingException('Failed to create user' . $th->getMessage());
         }
-
-        $this->authService->createUser(
-            $username,
-            $email,
-            $password,
-            1 
-        );
-
-        header('Location: /');
-        exit();
     }
 
     public function logout(){

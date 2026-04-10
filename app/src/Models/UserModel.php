@@ -1,19 +1,21 @@
 <?php
 
 namespace App\Models;
-use App\Core\Repository; 
+use App\Core\Repository;
+use App\Models\Enums\Roles;
+
 class UserModel{
     public int $id;
     public string $name;
     public string $email;
     public string $password_hash;
-    public string $role;
+    public Roles $role;
     public function __construct(
         int $id,
         string $name,
         string $email,
         string $password_hash,
-        string $role
+        Roles $role
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -23,13 +25,15 @@ class UserModel{
     }
 
     public static function fromArray(array $data): UserModel {
-        
+        $roleValue = $data['role'] ?? 'player';
+        $password = $data['password'] ?? $data['password_hash'] ?? '';
+
         return new UserModel(
             id: isset($data['id']) ? (int)$data['id'] : 0,
-            name: $data['name'] ?? 'Unknown',
+            name: $data['username'] ?? 'Unknown',
             email: $data['email'] ?? 'Unknown',
-            password_hash: $data['password_hash'] ?? '',
-            role: $data['role'] ?? 'user'
+            password_hash: $password,
+            role: Roles::from((string)$roleValue)
         );
     }
 

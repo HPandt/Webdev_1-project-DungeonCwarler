@@ -14,12 +14,15 @@ $formAction = $isEdit ? "/admin/monsters/update"
    : "/admin/monsters/create";
 ?>
 <?php require_once(__DIR__ . '/../../partials/header.php'); ?>
-<a href="/admin/monsters" class="btn btn-success btn-lg ms-2 mt-3">
-   <i class="bi bi-plus-circle"></i> Back to Monsters
-</a>
+<div class="ms-2 mt-3">
+   <a href="/admin/monsters" class="btn btn-success btn-lg ">
+      <i class="bi bi-plus-circle"></i> Back to Monsters
+   </a> 
+</div>
+
 <div class="container d-flex justify-content-center mb-3 mt-3 text-dark border-radius-10 p-8 ">
-   <div class="card shadow p-4" style="max-width: 600px; width: 100%;">
-      <form class="form" method="POST" action="<?php echo $formAction; ?>">
+   <div class="card card-form shadow p-4" style="max-width: 600px; width: 100%;">
+      <form class="form" method="POST" action="<?php echo $formAction; ?>" enctype="multipart/form-data">
          <?php if ($isEdit): ?>
             <input type="hidden" name="id" value="<?php echo $monster->id; ?>">
          <?php endif; ?>
@@ -29,6 +32,15 @@ $formAction = $isEdit ? "/admin/monsters/update"
          <input type="text" name="name"
             value="<?= htmlspecialchars($monster->name ?? '') ?>"
             placeholder="Name" required class="form-control mb-2">
+
+         <?php if ($isEdit && !empty($monster->img)): ?>
+            <div class="mb-2">
+               <img src="/assets/img/<?php echo htmlspecialchars($monster->img); ?>" alt="<?= htmlspecialchars($monster->name) ?>" class="img-fluid mb-2" style="max-height: 200px;" />
+            </div>
+         <?php endif; ?>
+
+         <label class="form-label" for="img">Image:</label>
+         <input type="file" name="img" accept="image/*" class="form-control mb-2">
 
          <label for="base_hp">Base HP:</label>
          <input type="number" name="base_hp"

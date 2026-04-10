@@ -14,5 +14,8 @@ WORKDIR /app
 # Allow running Composer as root within the container
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# Increase PHP upload limits for file uploads
+RUN printf "upload_max_filesize=5M\npost_max_size=5M\n" > /usr/local/etc/php/conf.d/uploads.ini
+
 # On container start, install dependencies if vendor is missing, then start php-fpm
 CMD ["sh", "-lc", "[ -f vendor/autoload.php ] || composer install --no-interaction --no-progress; exec php-fpm"]

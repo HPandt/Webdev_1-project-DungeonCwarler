@@ -5,10 +5,10 @@
 	<div class="row justify-content-center align-items-center" style="min-height:60vh;">
 		<div class="col-md-4 col-lg-3 gap-2">
 			<div class="card shadow-sm">
-                <img class="img img-responsive img-card-top" src="" alt="" srcset="">
+                
 				<div class="card-body p-4">
-
-					<h2 class="card-title text-center mb-3">Characters</h2>
+					<img class="img img-responsive img-card-top" src="" alt="" srcset="">
+					<h2 class="card-title text-center mb-3">Character Management</h2>
 
 					<?php if(!empty($_GET['error'])): ?>
 						<div class="alert alert-danger" role="alert">
@@ -24,7 +24,7 @@
 			<div class="card shadow-sm">
 				<div class="card-body p-4">
                     <img class="img img-responsive img-card-top" src="" alt="" srcset="">
-					<h2 class="card-title text-center mb-3">Monster management</h2>
+					<h2 class="card-title text-center mb-3">Monster Management</h2>
 
 					<?php if(!empty($_GET['error'])): ?>
 						<div class="alert alert-danger" role="alert">
@@ -40,7 +40,7 @@
 			<div class="card shadow-sm">
 				<div class="card-body p-4">
                     <img class="img img-responsive img-card-top" src="" alt="" srcset="">
-                    <h2 class="card-title text-center mb-3">Room management</h2>
+                    <h2 class="card-title text-center mb-3">Room Management</h2>
 
 					<?php if(!empty($_GET['error'])): ?>
 						<div class="alert alert-danger" role="alert">
@@ -57,7 +57,7 @@
 			<div class="card shadow-sm">
 				<div class="card-body p-4">
                     <img class="img img-responsive img-card-top" src="" alt="" srcset="">
-                    <h2 class="card-title text-center mb-3">User management</h2>
+                    <h2 class="card-title text-center mb-3">User Management</h2>
 
 					<?php if(!empty($_GET['error'])): ?>
 						<div class="alert alert-danger" role="alert">

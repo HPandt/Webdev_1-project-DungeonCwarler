@@ -29,7 +29,7 @@
 						</div>
 
 						<div class="mt-3 text-center small">
-							<a href="/register">Create an account</a> · <a href="/forgot-password">Forgot password?</a>
+							<a href="/register">Create an account</a>
 						</div>
 					</form>
 				</div>

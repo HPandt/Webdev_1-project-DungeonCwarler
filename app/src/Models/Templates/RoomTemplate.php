@@ -14,7 +14,7 @@ class RoomTemplate{
 
     public ?int $trapDamage;
 
-    public function __construct(int $id, string $name, string $description, RoomType $type, int $trapDamage, int $monsterId) {
+    public function __construct(int $id, string $name, ?string $description, RoomType $type, ?int $trapDamage, ?int $monsterId) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
@@ -35,13 +35,27 @@ class RoomTemplate{
 
     public static function fromArray(array $data): RoomTemplate {
         $type = isset($data['type']) ? RoomType::from((string)$data['type']) : RoomType::empty;
+        $trapDamage = null;
+        if (isset($data['trap_damage'])) {
+            $trapDamage = (int)$data['trap_damage'];
+        } elseif (isset($data['trapDamage'])) {
+            $trapDamage = (int)$data['trapDamage'];
+        }
+
+        $monsterId = null;
+        if (isset($data['monster_template']) && $data['monster_template'] !== '') {
+            $monsterId = (int)$data['monster_template'];
+        } elseif (isset($data['monsterId']) && $data['monsterId'] !== '') {
+            $monsterId = (int)$data['monsterId'];
+        }
+
         return new RoomTemplate(
             id: isset($data['id']) ? (int)$data['id'] : 0,
             name: $data['name'] ?? 'Unknown',
             description: $data['description'] ?? null,
             type: $type,
-            trapDamage: (int)$data['trap_damage'],
-            monsterId: (int)$data['monster_template']
+            trapDamage: $trapDamage,
+            monsterId: $monsterId
         );
     }
 

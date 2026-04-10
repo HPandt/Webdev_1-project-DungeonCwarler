@@ -22,7 +22,7 @@ use App\Models\UserModel;
     <?php else: ?>
         <div class="table-responsive">
             <table class="table table-hover table-striped align-middle">
-                <thead class="table-dark border-bottom border-3 border-light">
+                <thead class="table-light">
                     <tr>
                         <th style="min-width: 150px;">Name</th>
                         <th style="min-width: 200px;">Email</th>
@@ -40,8 +40,8 @@ use App\Models\UserModel;
                                 <small class="text-muted"><?= htmlspecialchars($user->email) ?></small>
                             </td>
                             <td>
-                                <span class="badge <?= $user->role === 'admin' ? 'bg-danger' : 'bg-primary' ?>">
-                                    <?= ucfirst($user->role) ?>
+                                <span class="badge <?= $user->role->value === 'admin' ? 'bg-danger' : 'bg-primary' ?>">
+                                    <?= ucfirst($user->role->value) ?>
                                 </span>
                             </td>
                             <td style="text-align: center;">

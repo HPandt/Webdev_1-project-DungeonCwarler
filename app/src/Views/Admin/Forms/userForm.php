@@ -15,11 +15,14 @@
     : "/admin/users/create";
   ?>
  <?php require_once(__DIR__ . '/../../partials/header.php'); ?>
- <a href="/admin/users" class="btn btn-success btn-lg ms-2 mt-3">
-   <i class="bi bi-plus-circle"></i> Back to Users
- </a>
+ <div class="ms-2 mt-3">
+   <a href="/admin/users" class="btn btn-success btn-lg ">
+     <i class="bi bi-plus-circle"></i> Back to Users
+   </a>
+ </div>
+
  <div class="container d-flex justify-content-center mb-3 mt-3 text-dark border-radius-10 p-8">
-   <div class="card shadow p-4" style="max-width: 600px; width: 100%;">
+   <div class="card card-form shadow p-4" style="max-width: 600px; width: 100%;">
      <form class="form" method="POST" action="<?php echo $formAction; ?>">
        <?php if ($isEdit): ?>
          <input type="hidden" name="id" value="<?php echo $user->id; ?>">
@@ -37,22 +40,26 @@
          placeholder="Email" required class="form-control mb-2">
 
 
-       <label for="type">Type:</label>
-       <select name="type" class="form-control mb-2">
-         <option value="">Select Type</option>
+       <label for="role">Role:</label>
+       <select name="role" class="form-control mb-2">
+         <?php if (!$isEdit): ?>
+            <option value="">Select Role</option>
+          <?php endif; ?>
+         
          <?php foreach (Roles::cases() as $role): ?>
            <option value="<?= $role->value ?>"
-             <?= isset($room) && $room->type->value === $role->value ? 'selected' : '' ?>>
+             <?= isset($user) && $user->role->value === $role->value ? 'selected' : '' ?>>
              <?= ucfirst($role->name) ?>
            </option>
          <?php endforeach; ?>
        </select>
 
        <label for="password">Password:</label>
-       <input type="password" name="password" disabled
-         value="<?= htmlspecialchars($user->password_hash ?? '') ?>"
-         <?= $isEdit ? 'disabled' : 'required' ?>
-         placeholder="Password" class="form-control mb-2">
+       <?php if ($isEdit): ?>
+         <input type="password" name="password" value="<?= htmlspecialchars($user->password_hash ?? '') ?>" disabled placeholder="Password hash" class="form-control mb-2">
+       <?php else: ?>
+         <input type="password" name="password" value="" required placeholder="Password" class="form-control mb-2">
+       <?php endif; ?>
 
        <button type="submit" class="btn btn-primary w-100">
          <?= $isEdit ? 'Update User' : 'Create User' ?>

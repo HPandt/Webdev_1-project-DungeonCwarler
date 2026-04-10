@@ -2,6 +2,7 @@
 namespace App\Controllers;
 use App\Services\AdminService;
 use App\Services\AuthService;
+use App\Services\ImageService;
 use App\Models\Templates\CharacterTemplate;
 use App\Models\Templates\MonsterTemplate;
 use App\Models\Templates\RoomTemplate;
@@ -11,9 +12,12 @@ use App\Models\UserModel;
 class AdminController {
     private AdminService $adminService;
     private AuthService $authService;
+    private ImageService $imageService;
+
     public function __construct() {
         $this->adminService = new AdminService();
         $this->authService = new AuthService();
+        $this->imageService = new ImageService();
     }
 
     public function dashBoard() {
@@ -59,13 +63,17 @@ class AdminController {
                 header('Location: /admin/users?error=Invalid user ID');
                 exit();
             }
-            $user = $this->adminService->getUserById((int)$userId);
-            if (!$user) {
+            $existingUser = $this->adminService->getUserById((int)$userId);
+            if (!$existingUser) {
                 header('Location: /admin/users?error=User not found');
                 exit();
             }
+
             $user = UserModel::fromArray($_POST);
-            
+            if (empty($_POST['password'])) {
+                $user->password_hash = $existingUser->password_hash;
+            }
+
             $this->adminService->updateUser($user);
             header('Location: /admin/users');
             exit();
@@ -101,9 +109,12 @@ class AdminController {
 
     public function createCharacterTemplate() {
         try {
-            
             $characterTemplate = CharacterTemplate::fromArray($_POST);
-            
+
+            if (isset($_FILES['img']) && $_FILES['img']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $characterTemplate->img = $this->imageService->uploadTemplateImage($_FILES['img']);
+            }
+
             $this->adminService->createCharacterTemplate($characterTemplate);
             header('Location: /admin/characters');
             exit();
@@ -124,17 +135,29 @@ class AdminController {
 
     public function updateCharacterTemplate() {
         try {
-            //code...
+            $existingCharacter = $this->adminService->getCharacterTemplateById((int)($_POST['id'] ?? 0));
+            if (!$existingCharacter) {
+                header('Location: /admin/characters?error=Character not found');
+                exit();
+            }
+
             $characterTemplate = CharacterTemplate::fromArray($_POST);
-            if(!$characterTemplate->id){
+            $characterTemplate->img = $existingCharacter->img;
+
+            if (isset($_FILES['img']) && $_FILES['img']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $characterTemplate->img = $this->imageService->uploadTemplateImage($_FILES['img'], $existingCharacter->img);
+            }
+
+            if (!$characterTemplate->id) {
                 header('Location: /admin/characters?error=Invalid character ID');
                 exit();
-            }   
+            }
+
             $this->adminService->updateCharacterTemplate($characterTemplate);
             header('Location: /admin/characters');
             exit();
         } catch (\Throwable $th) {
-            throw new \Exception("Error creating character template: " . $th->getMessage());
+            throw new \Exception("Error updating character template: " . $th->getMessage());
         }    
     }
 
@@ -229,6 +252,11 @@ class AdminController {
     public function createMonsterTemplate(){
         try {
             $monsterTemplate = MonsterTemplate::fromArray($_POST);
+
+            if (isset($_FILES['img']) && $_FILES['img']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $monsterTemplate->img = $this->imageService->uploadTemplateImage($_FILES['img']);
+            }
+
             $this->adminService->createMonsterTemplate($monsterTemplate);
             header('Location: /admin/monsters');
             exit();
@@ -251,7 +279,19 @@ class AdminController {
 
     public function updateMonsterTemplate(){
         try {
+            $existingMonster = $this->adminService->getMonsterTemplateById((int)($_POST['id'] ?? 0));
+            if (!$existingMonster) {
+                header('Location: /admin/monsters?error=Monster not found');
+                exit();
+            }
+
             $monsterTemplate = MonsterTemplate::fromArray($_POST);
+            $monsterTemplate->img = $existingMonster->img;
+
+            if (isset($_FILES['img']) && $_FILES['img']['error'] !== UPLOAD_ERR_NO_FILE) {
+                $monsterTemplate->img = $this->imageService->uploadTemplateImage($_FILES['img'], $existingMonster->img);
+            }
+
             if(!$monsterTemplate->id){
                 header('Location: /admin/monsters?error=Invalid monster ID');
                 exit();

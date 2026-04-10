@@ -16,8 +16,8 @@
         </div>
 
         <!-- Game Log -->
-        <div class="col-md-9 d-flex flex-column min-h-0">
-            <div class="shadow-sm h-100 d-flex flex-column min-h-0">
+        <div class="col-md-9 d-flex flex-column min-h-0 mb-5">
+            <div class="shadow-sm h-90 d-flex flex-column min-h-0">
 
                 <div id="game-log" class="game-log flex-grow-1 overflow-auto">
                 </div>
